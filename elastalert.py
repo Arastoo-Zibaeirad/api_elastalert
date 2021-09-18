@@ -441,80 +441,80 @@ class ElastAlerter(object):
                 
             hits = res['hits']['hits']
         
-        # elif rule['kql']:
-        #     print("\nline445")
+        elif rule['kql']:
+            print("\nline445")
             
-        #     query = json.dumps(rule['kql'])
-        #     print("KQL_QUERY: ", query)
-        #     # index1 = index.split(',')
+            query = json.dumps(rule['kql'])
+            print("KQL_QUERY: ", query)
+            # index1 = index.split(',')
             
-        #     # for i in index1:
-        #     #     uri = "http://192.168.250.120:9200/{}/_search?pretty".format(i)
+            # for i in index1:
+            #     uri = "http://192.168.250.120:9200/{}/_search?pretty".format(i)
                 
                     
-        #     #     print("uri: ", uri)
-        #     #     headers = {
-        #     #     'Content-Type': 'application/json'
-        #     #     }
-        #     #     res1 = requests.get(uri, headers = headers, data = query)
-        #     #     # print("kql_res: ",res1)
-        #     #     res = res1.json()   
-        #     #     print("KQL_res: ",res)     
-        #     # hits= res['hits']['hits']
-        #     if self.thread_data.current_es.is_atleastsixsix():
-        #         extra_args = {'_source_includes': rule['include']}
-        #     else:
-        #         extra_args = {'_source_include': rule['include']}
-        #     scroll_keepalive = rule.get('scroll_keepalive', self.scroll_keepalive)
-        #     if not rule.get('_source_enabled'):
-        #         if rule['five']:
-        #             query['stored_fields'] = rule['include']
-        #         else:
-        #             query['fields'] = rule['include']
-        #         extra_args = {}
+            #     print("uri: ", uri)
+            #     headers = {
+            #     'Content-Type': 'application/json'
+            #     }
+            #     res1 = requests.get(uri, headers = headers, data = query)
+            #     # print("kql_res: ",res1)
+            #     res = res1.json()   
+            #     print("KQL_res: ",res)     
+            # hits= res['hits']['hits']
+            if self.thread_data.current_es.is_atleastsixsix():
+                extra_args = {'_source_includes': rule['include']}
+            else:
+                extra_args = {'_source_include': rule['include']}
+            scroll_keepalive = rule.get('scroll_keepalive', self.scroll_keepalive)
+            if not rule.get('_source_enabled'):
+                if rule['five']:
+                    query['stored_fields'] = rule['include']
+                else:
+                    query['fields'] = rule['include']
+                extra_args = {}
 
-        #     try:
-        #         if scroll:
+            try:
+                if scroll:
                     
-        #             res = self.thread_data.current_es.scroll(scroll_id=rule['scroll_id'], scroll=scroll_keepalive)
+                    res = self.thread_data.current_es.scroll(scroll_id=rule['scroll_id'], scroll=scroll_keepalive)
                     
-        #         else:
-        #             res = self.thread_data.current_es.search(
-        #                 scroll=scroll_keepalive,
-        #                 index=index,
-        #                 size=rule.get('max_query_size', self.max_query_size),
-        #                 body=query,
-        #                 ignore_unavailable=True,
-        #                 **extra_args
-        #             )
+                else:
+                    res = self.thread_data.current_es.search(
+                        scroll=scroll_keepalive,
+                        index=index,
+                        size=rule.get('max_query_size', self.max_query_size),
+                        body=query,
+                        ignore_unavailable=True,
+                        **extra_args
+                    )
                     
-        #             if '_scroll_id' in res:
-        #                 rule['scroll_id'] = res['_scroll_id']
+                    if '_scroll_id' in res:
+                        rule['scroll_id'] = res['_scroll_id']
 
-        #             if self.thread_data.current_es.is_atleastseven():
-        #                 self.thread_data.total_hits = int(res['hits']['total']['value'])
-        #             else:
-        #                 self.thread_data.total_hits = int(res['hits']['total'])
+                    if self.thread_data.current_es.is_atleastseven():
+                        self.thread_data.total_hits = int(res['hits']['total']['value'])
+                    else:
+                        self.thread_data.total_hits = int(res['hits']['total'])
 
-        #         if len(res.get('_shards', {}).get('failures', [])) > 0:
-        #             try:
-        #                 errs = [e['reason']['reason'] for e in res['_shards']['failures'] if 'Failed to parse' in e['reason']['reason']]
-        #                 if len(errs):
-        #                     raise ElasticsearchException(errs)
-        #             except (TypeError, KeyError):
-        #                 # Different versions of ES have this formatted in different ways. Fallback to str-ing the whole thing
-        #                 raise ElasticsearchException(str(res['_shards']['failures']))
+                if len(res.get('_shards', {}).get('failures', [])) > 0:
+                    try:
+                        errs = [e['reason']['reason'] for e in res['_shards']['failures'] if 'Failed to parse' in e['reason']['reason']]
+                        if len(errs):
+                            raise ElasticsearchException(errs)
+                    except (TypeError, KeyError):
+                        # Different versions of ES have this formatted in different ways. Fallback to str-ing the whole thing
+                        raise ElasticsearchException(str(res['_shards']['failures']))
 
-        #         logging.debug(str(res))
-        #     except ElasticsearchException as e:
-        #         # Elasticsearch sometimes gives us GIGANTIC error messages
-        #         # (so big that they will fill the entire terminal buffer)
-        #         if len(str(e)) > 1024:
-        #             e = str(e)[:1024] + '... (%d characters removed)' % (len(str(e)) - 1024)
-        #         self.handle_error('Error running query: %s' % (e), {'rule': rule['name'], 'query': query})
-        #         return None
+                logging.debug(str(res))
+            except ElasticsearchException as e:
+                # Elasticsearch sometimes gives us GIGANTIC error messages
+                # (so big that they will fill the entire terminal buffer)
+                if len(str(e)) > 1024:
+                    e = str(e)[:1024] + '... (%d characters removed)' % (len(str(e)) - 1024)
+                self.handle_error('Error running query: %s' % (e), {'rule': rule['name'], 'query': query})
+                return None
                 
-        #     hits = res['hits']['hits']
+            hits = res['hits']['hits']
     
         elif rule['eql']:
             print("\nline 517")
@@ -541,7 +541,6 @@ class ElastAlerter(object):
             for indx in index:
                 print("\n\nindx: ", indx)      
 
-            
             # try:
                 uri = f"http://192.168.250.120:9200/{indx}/_eql/search?pretty"
                 print("\n\nuri: ",uri)
@@ -567,13 +566,9 @@ class ElastAlerter(object):
                         hits = res['hits']['events']
                     elif 'sequences' in res['hits']:
                         hits = res['hits']['sequences'][0]['events']
-                        
                 collector.extend(hits)
-                print("\nlen collector", len(collector))
-            
             hits = collector
 
-     
         self.thread_data.num_hits += len(hits)
         lt = rule.get('use_local_time')
         status_log = "Queried rule %s from %s to %s: %s / %s hits" % (
@@ -600,7 +595,6 @@ class ElastAlerter(object):
         # print("hits: ", hits)
         return hits
         
-
     def get_hits_count(self, rule, starttime, endtime, index):
         """ Query Elasticsearch for the count of results and returns a list of timestamps
         equal to the endtime. This allows the results to be passed to rules which expect
