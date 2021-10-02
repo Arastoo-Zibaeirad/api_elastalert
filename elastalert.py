@@ -379,6 +379,8 @@ class ElastAlerter(object):
         :param endtime: The latest time to query.
         :return: A list of hits, bounded by rule['max_query_size'] (or self.max_query_size).
         """
+       
+            
         if rule.get('filter') or rule.get('kql'):
             print("\nline382")
             query = self.get_query(
@@ -541,7 +543,7 @@ class ElastAlerter(object):
             collector = []
             for indx in index:
                 print("\nindx: ", indx)      
-                uri = f"http://192.168.250.120:9200/{indx}/_eql/search?pretty"
+                uri = f"{self.conf['protocol']}://{self.conf['es_host']}:{self.conf['es_port']}/{indx}/_eql/search?pretty"
                 print("\nuri: ",uri)
                 headers = {
                 'Content-Type': 'application/json'
@@ -579,21 +581,24 @@ class ElastAlerter(object):
             self.thread_data.num_hits,
             len(hits)
         )
-        # if self.thread_data.total_hits > rule.get('max_query_size', self.max_query_size):
-        #     elastalert_logger.info("%s (scrolling..)" % status_log)
-        # else:
-        #     elastalert_logger.info(status_log)
-
+        if rule.get('filter') or rule.get('kql'):
+            if self.thread_data.total_hits > rule.get('max_query_size', self.max_query_size):
+                elastalert_logger.info("%s (scrolling..)" % status_log)
+            else:
+                elastalert_logger.info(status_log)
+        elif rule.get('eql'):
+                elastalert_logger.info(status_log)
+            
         hits = self.process_hits(rule, hits)
         
         
         # Record doc_type for use in get_top_counts (deprecated in ES7)
-        # if 'filter' or 'kql' in rule:
-        #     if 'doc_type' not in rule and len(hits):
-        #         # rule['doc_type'] = events[0]['_source']['event']['category']
-        #         rule['doc_type'] = hits[0]['_type']
+        if rule.get('filter') or rule.get('kql'):
+    
+            if 'doc_type' not in rule and len(hits):
+                # rule['doc_type'] = events[0]['_source']['event']['category']
+                rule['doc_type'] = hits[0]['_type']
                 
-        # print("hits: ", hits)
         return hits
         
 
