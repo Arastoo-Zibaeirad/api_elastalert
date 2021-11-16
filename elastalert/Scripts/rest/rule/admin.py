@@ -5,11 +5,17 @@ from .models import Rule, Query
 
 class QueryInline(admin.TabularInline):
     model = Query
+    extra = 5
 class RuleAdmin(admin.ModelAdmin):
-    list_display = ['name', 'index_name', 'create_time', 'modified_time', 'query']
+    # class Meta:
+    #     model = Rule
+    list_display = ['id', 'name', 'index_name', 'create_time', 'modified_time','queries']
     search_fields = ['name', 'index_name', 'create_time', 'modified_time']
     list_display_links = ['name']
-    inlines = [QueryInline]
+    inlines = [
+        QueryInline,
+        ]
+
 
 
 class QueryAdmin(admin.ModelAdmin):
