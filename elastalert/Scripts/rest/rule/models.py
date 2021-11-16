@@ -9,6 +9,21 @@ class Rule(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
 
+
+    @property
+    def total(self):
+        a=""
+        queries = self.queries.all()
+        for query in queries:
+            # for i in range(len(queries)):
+            if query.sequence == False:
+                a += str(f"{query.event_category} where {query.condition}")
+            elif query.sequence:
+                a += str(f"sequence\\n [{query.event_category} where {query.condition}] ")
+
+            # a+=str(query.event_category)
+        return a    
+
     class Meta:
         verbose_name = 'Rule'
         verbose_name_plural = 'Rules'
@@ -78,11 +93,9 @@ class Query(models.Model):
         verbose_name_plural = 'Queries'
 
     def __str__(self):
-        # return f"[{self.event_category} where {self.condition}]\\n "
         if self.sequence == False:
-            return f"[{self.event_category} where {self.condition}]"
-        
+            return f'{self.event_category} where {self.condition}'
         elif self.sequence:
-            return f"sequence\\n [{self.event_category} where {self.condition}]"
+            return f'sequence\n  [{self.event_category} where {self.condition}] '    
 
-
+       

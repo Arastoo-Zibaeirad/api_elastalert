@@ -17,28 +17,27 @@ from django.shortcuts import get_object_or_404
 
 def query_total(request):
     try:
-        q = Query.objects.all()
-        if Query.sequence == False:
-            return f'{Query.event_category} where {Query.condition}'
+        rule = Rule.objects.get(id=7)
+        queries = rule.queries.all()
+        for query in queries:
+            if query.sequence == False:
+                print(f"{query.event_category} where {query.condition}")
+            
+            elif query.sequence:
+                print(f"sequence\\n [{query.event_category} where {query.condition}] ")            
+        # if Query.sequence == False:
+        #     return f'{Query.event_category} where {Query.condition}'
         
-    # elif Query.sequence:
-    #     return f'sequence\n  [{Query.event_category} where {Query.condition}]'
+        # elif Query.sequence:
+        #     return f'sequence\n  [{Query.event_category} where {Query.condition}]'
+        
     
-    # rule = Rule.objects.all()
-    # q = Query.objects.all()
-    # r = Rule.queries.all()
-
-
-        rules = Rule.objects.all()
-        for rule in rules:
-            queries = rule.queries.all()
-            for qs in queries:
-                print(qs)
 
     except:
         return response.HttpResponse("ERROR")
         
-    return response.HttpResponse(queries)
+    # return response.HttpResponse(queries) 
+    return response.HttpResponse(queries[0])
     
 
 
@@ -46,22 +45,32 @@ def query_total(request):
 
 def query_total_detail(request, pk):
     try:
-        # rule = Rule.objects.get(pk=pk)
-        # rule = Rule.objects.all()
-        # for rule in rule:
-        #     queries = rule.queries.get(pk=pk)
-        #     for qs in queries:
-        #         print(qs)
-        q = Query.objects.get(pk=pk)
+
+        rule = Rule.objects.get(pk=pk)
+        q = rule.queries.all()
+
     except:
         return response.HttpResponse("does not exist")    
     
-    return response.HttpResponse(f"{q.event_category}")
+    return response.HttpResponse(q)
 
+def get_rule_id(request, pk):
+    rule = Rule.objects.get(pk=pk)
+    queries = rule.queries.all()
+    for query in queries:
+        if query.sequence == False:
+            print(f"{query.event_category} where {query.condition}")
+        
+        elif query.sequence:
+            print(f"sequence\\n [{query.event_category} where {query.condition}] ")
 
-
-
-
+    return response.HttpResponse(queries)
+    # if sequence == False:
+    #     return f"{self.event_category} where {self.condition}"
+    
+    # elif sequence:
+    #     return f"sequence\\n [{self.event_category} where {self.condition}] "
+    
 
 # Create your views here.
 # ############################################################
