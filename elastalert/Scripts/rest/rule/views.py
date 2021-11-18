@@ -8,7 +8,7 @@ from rest_framework import HTTP_HEADER_ENCODING, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
-from .models import Rule, Query
+from .models import Rule, Query, Config
 from .serializers import RuleSerializer
 
 from rest_framework import viewsets
@@ -17,61 +17,79 @@ from django.shortcuts import get_object_or_404
 
 def query_total(request):
     try:
-        rule = Rule.objects.get(id=7)
+        
+        rule = Rule.objects.get(id=3)
         queries = rule.queries.all()
-        for query in queries:
-            if query.sequence == False:
-                print(f"{query.event_category} where {query.condition}")
+        print("1: ", queries)
+        seq = rule.config.sequence
+        print("seq: ", seq)
+       
+       
+        # x = ""
+        
+        for i in range (len(queries)):
+            # print("test: ",queries[i].event_category)
             
-            elif query.sequence:
-                print(f"sequence\\n [{query.event_category} where {query.condition}] ")            
-        # if Query.sequence == False:
-        #     return f'{Query.event_category} where {Query.condition}'
-        
-        # elif Query.sequence:
-        #     return f'sequence\n  [{Query.event_category} where {Query.condition}]'
-        
-    
+            b = "sequence\n "
+            # print("test: ",)
+            
+            
+        #     c = (f"[{queries[i].event_category} where {queries[i].condition}] ")
+        #     x = x + c
+
+        # z = b + x 
+        # print(z)
+
+            
+            
+            # if query.sequence == False:
+            #     a += str(f"{queries[i].event_category} where {queries[i].condition} ")
+
+            # elif query.sequence:
+            #     # for i in range(len(queries)):
+            #     a += str(f"sequence\\n [{queries[0].event_category} where {queries[0].condition}] ")
+            #     # a += 'sequence [%s where aaa] '%query.event_category[1]
+            #     print(a)
+
+
+            # print(a)
+        return response.HttpResponse("hello")            
+
 
     except:
         return response.HttpResponse("ERROR")
         
     # return response.HttpResponse(queries) 
-    return response.HttpResponse(queries[0])
+    # return response.HttpResponse(query)
     
 
 
 
 
-def query_total_detail(request, pk):
-    try:
+# def query_total_detail(request, pk):
+#     try:
 
-        rule = Rule.objects.get(pk=pk)
-        q = rule.queries.all()
+#         rule = Rule.objects.get(pk=pk)
+#         q = rule.queries.all()
 
-    except:
-        return response.HttpResponse("does not exist")    
+#     except:
+#         return response.HttpResponse("does not exist")    
     
-    return response.HttpResponse(q)
+#     return response.HttpResponse(q)
 
-def get_rule_id(request, pk):
-    rule = Rule.objects.get(pk=pk)
-    queries = rule.queries.all()
-    for query in queries:
-        if query.sequence == False:
-            print(f"{query.event_category} where {query.condition}")
+# def get_rule_id(request, pk):
+#     rule = Rule.objects.get(pk=pk)
+#     queries = rule.queries.all()
+#     config = rule.config.all()
+#     for query in queries:
+#         if query.sequence == False:
+#             print(f"{query.event_category} where {query.condition}")
         
-        elif query.sequence:
-            print(f"sequence\\n [{query.event_category} where {query.condition}] ")
+#         elif query.sequence:
+#             print(f"sequence\\n [{query.event_category} where {query.condition}] ")
 
-    return response.HttpResponse(queries)
-    # if sequence == False:
-    #     return f"{self.event_category} where {self.condition}"
+#     return response.HttpResponse(queries)
     
-    # elif sequence:
-    #     return f"sequence\\n [{self.event_category} where {self.condition}] "
-    
-
 # Create your views here.
 # ############################################################
 # class RuleList(generics.ListCreateAPIView):
@@ -208,7 +226,3 @@ def get_rule_id(request, pk):
 #     #     rule.save()
 #     instance.delete()
 #     return Response("Rule Deleted")
-
-
-
-    
